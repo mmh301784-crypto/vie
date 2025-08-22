@@ -1,0 +1,8 @@
+Improve server stability and resource management for video processing
+
+Introduce `start_server.py` for controlled gunicorn startup, adjust logging levels, optimize memory management with `gc.set_threshold`, reduce thread stack size, fine-tune gunicorn worker counts and timeouts, and add `psutil` for process management and cleanup.
+
+Replit-Commit-Author: Agent
+Replit-Commit-Session-Id: 55de5083-d362-4818-a298-d3625f42e2e5
+Replit-Commit-Checkpoint-Type: full_checkpoint
+Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/ae950c2f-2323-411c-b241-e479de67266d/55de5083-d362-4818-a298-d3625f42e2e5/iuWkmBc

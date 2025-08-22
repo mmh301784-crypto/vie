@@ -1,0 +1,108 @@
+import os
+import zipfile
+import tempfile
+import shutil
+import subprocess
+from flask import Flask, request, send_file, jsonify
+
+app = Flask(__name__)
+
+@app.route("/upload", methods=["POST"])
+def upload():
+    try:
+        if "file" not in request.files:
+            return jsonify({"error": "❌ لم يتم رفع أي ملف. الرجاء رفع ملف مضغوط (ZIP)."}), 400
+
+        file = request.files["file"]
+
+        # عمل مجلد مؤقت
+        temp_dir = tempfile.mkdtemp()
+        zip_path = os.path.join(temp_dir, "uploaded.zip")
+        file.save(zip_path)
+
+        # فك الضغط
+        try:
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(temp_dir)
+        except zipfile.BadZipFile:
+            shutil.rmtree(temp_dir)
+            return jsonify({"error": "❌ الملف المرفوع ليس ملف مضغوط صالح (ZIP)."}), 400
+
+        # البحث عن ملف الصوت
+        audio_file = None
+        for root, _, files in os.walk(temp_dir):
+            for f in files:
+                if f.lower().endswith((".mp3", ".wav")):
+                    audio_file = os.path.join(root, f)
+                    break
+            if audio_file:
+                break
+
+        if not audio_file:
+            shutil.rmtree(temp_dir)
+            return jsonify({"error": "❌ لم يتم العثور على ملف صوتي (MP3 أو WAV) داخل الملف المضغوط."}), 400
+
+        # البحث عن الصور PNG بالترتيب
+        images = []
+        for root, _, files in os.walk(temp_dir):
+            for f in files:
+                if f.lower().endswith(".png"):
+                    images.append(os.path.join(root, f))
+
+        images.sort()
+
+        if not images:
+            shutil.rmtree(temp_dir)
+            return jsonify({"error": "❌ لم يتم العثور على أي صور PNG داخل الملف المضغوط."}), 400
+
+        # إنشاء قائمة نصية للصور لـ FFmpeg
+        images_list_file = os.path.join(temp_dir, "images.txt")
+        with open(images_list_file, "w") as f:
+            for img in images:
+                f.write(f"file '{img}'\n")
+
+        # حساب مدة كل صورة بالثواني
+        # لنفترض أن المدة لكل صورة متساوية (تحتاج معرفة طول الصوت)
+        # استخدم ffprobe للحصول على طول الصوت
+        try:
+            result = subprocess.run(
+                ["ffprobe", "-i", audio_file, "-show_entries", "format=duration", "-v", "quiet", "-of", "csv=p=0"],
+                capture_output=True, text=True
+            )
+            audio_duration = float(result.stdout.strip())
+        except Exception as e:
+            shutil.rmtree(temp_dir)
+            return jsonify({"error": f"❌ حدث خطأ أثناء قراءة مدة الصوت: {str(e)}"}), 500
+
+        per_image_duration = audio_duration / len(images)
+
+        # توليد فيديو من الصور باستخدام FFmpeg
+        output_path = os.path.join(temp_dir, "output.mp4")
+        try:
+            # -r fps: هنا ممكن نختار fps 30
+            # -vf "fps=30,format=yuv420p": لتوافقية الفيديو
+            subprocess.run([
+                "ffmpeg",
+                "-y",
+                "-f", "concat",
+                "-safe", "0",
+                "-i", images_list_file,
+                "-i", audio_file,
+                "-c:v", "libx264",
+                "-r", "30",
+                "-pix_fmt", "yuv420p",
+                "-c:a", "aac",
+                "-shortest",
+                output_path
+            ], check=True)
+        except subprocess.CalledProcessError as e:
+            shutil.rmtree(temp_dir)
+            return jsonify({"error": f"❌ حدث خطأ أثناء إنشاء الفيديو باستخدام FFmpeg: {str(e)}"}), 500
+
+        return send_file(output_path, as_attachment=True, download_name="output.mp4")
+
+    except Exception as e:
+        return jsonify({"error": f"❌ خطأ غير متوقع: {str(e)}"}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True)

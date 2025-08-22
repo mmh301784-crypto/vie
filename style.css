@@ -1,0 +1,181 @@
+/* Custom styles for the video generation app */
+
+/* RTL support improvements */
+body {
+    font-family: 'Segoe UI', 'Cairo', 'Amiri', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Progress bar enhancements */
+.progress {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.3s ease;
+    font-weight: bold;
+    line-height: 25px;
+}
+
+/* Upload area styling */
+.form-control-lg {
+    border-radius: 10px;
+    border: 2px dashed var(--bs-border-color);
+    transition: all 0.3s ease;
+}
+
+.form-control-lg:hover {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.1rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.form-control-lg:focus {
+    border-color: var(--bs-primary);
+    border-style: solid;
+}
+
+/* Button enhancements */
+.btn-lg {
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Card styling */
+.card {
+    border: none;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.card-body {
+    border-radius: 15px;
+}
+
+/* Video player styling */
+video {
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Status indicators */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Upload size indicator */
+#upload-size {
+    font-weight: 500;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* Animation for section transitions */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    background: var(--bs-body-bg);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 400px;
+}
+
+/* File input styling */
+.form-control[type="file"] {
+    cursor: pointer;
+}
+
+.form-control[type="file"]::-webkit-file-upload-button {
+    background: var(--bs-primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.form-control[type="file"]::-webkit-file-upload-button:hover {
+    background: var(--bs-primary-dark, #0056b3);
+}
+
+/* Progress text styling */
+.progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive video container */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .btn-lg {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+}
+
+/* Dark mode specific improvements */
+[data-bs-theme="dark"] .form-control-lg {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-bs-theme="dark"] .card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+}
+
+[data-bs-theme="dark"] video {
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+}

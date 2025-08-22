@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء الفيديوهات من الصوت والصور</title>
+    
+    <!-- Bootstrap CSS with Replit theme -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container my-5">
+        <!-- Header -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 mb-3">
+                        <i class="fas fa-rocket text-primary"></i>
+                        سيرفر خارق جداً 🚀🔥
+                    </h1>
+                    <p class="lead text-muted">
+                        ارفع ملف مضغوط يحتوي على ملف صوتي وصور لإنشاء فيديو احترافي
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="row justify-content-center" id="upload-section">
+            <div class="col-lg-8">
+                <div class="card shadow-lg">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">
+                            <i class="fas fa-cloud-upload-alt text-info"></i>
+                            رفع الملف
+                        </h4>
+                        
+                        <!-- File Upload Form -->
+                        <form id="upload-form" enctype="multipart/form-data">
+                            <div class="mb-4">
+                                <label for="file-input" class="form-label">
+                                    اختر ملف ZIP (حد أقصى 1 جيجابايت) 🚀🔥💪
+                                </label>
+                                <input 
+                                    type="file" 
+                                    class="form-control form-control-lg" 
+                                    id="file-input" 
+                                    name="file" 
+                                    accept=".zip"
+                                    required
+                                >
+                                <div class="form-text">
+                                    يجب أن يحتوي الملف المضغوط على ملف صوتي (MP3, WAV, M4A, AAC) وصور (PNG, JPG, JPEG)
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="upload-btn">
+                                <i class="fas fa-upload"></i>
+                                رفع وإنشاء الفيديو
+                            </button>
+                        </form>
+
+                        <!-- Upload Progress -->
+                        <div class="mt-4 d-none" id="upload-progress">
+                            <h6>تقدم الرفع:</h6>
+                            <div class="progress mb-2" style="height: 25px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     id="upload-progress-bar" 
+                                     role="progressbar" 
+                                     style="width: 0%">
+                                    0%
+                                </div>
+                            </div>
+                            <small class="text-muted" id="upload-size">0 MB / 0 MB</small>
+                        </div>
+
+                        <!-- Processing Progress -->
+                        <div class="mt-4 d-none" id="processing-progress">
+                            <h6>تقدم المعالجة:</h6>
+                            <div class="progress mb-2" style="height: 25px;">
+                                <div class="progress-bar bg-info progress-bar-striped progress-bar-animated" 
+                                     id="processing-progress-bar" 
+                                     role="progressbar" 
+                                     style="width: 0%">
+                                    0%
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border spinner-border-sm text-info me-2" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <small class="text-muted" id="processing-message">جاري المعالجة...</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Result Section -->
+        <div class="row justify-content-center d-none" id="result-section">
+            <div class="col-lg-10">
+                <div class="card shadow-lg">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="card-title mb-0">
+                                <i class="fas fa-play-circle text-success"></i>
+                                الفيديو الناتج
+                            </h4>
+                            <div>
+                                <button class="btn btn-success me-2" id="download-btn">
+                                    <i class="fas fa-download"></i>
+                                    تحميل الفيديو
+                                </button>
+                                <button class="btn btn-outline-secondary" id="new-upload-btn">
+                                    <i class="fas fa-plus"></i>
+                                    رفع جديد
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Video Player -->
+                        <div class="ratio ratio-16x9">
+                            <video 
+                                id="result-video" 
+                                controls 
+                                preload="metadata"
+                                class="rounded"
+                                style="background: #000;">
+                                <source src="" type="video/mp4">
+                                متصفحك لا يدعم تشغيل الفيديو.
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Alert -->
+        <div class="row justify-content-center d-none" id="error-section">
+            <div class="col-lg-8">
+                <div class="alert alert-danger shadow-sm" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="error-message"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-8 text-center">
+                <hr class="my-4">
+                <p class="text-muted small">
+                    <i class="fas fa-fire"></i>
+                    سيرفر خارق جداً بقوة فضائية! يدعم ملفات ZIP ضخمة. 
+                    الحد الأقصى 1 جيجابايت ومدة المعالجة 20 ساعة! 🚀🔥💪
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+</body>
+</html>
